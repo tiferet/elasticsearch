@@ -1,0 +1,58 @@
+
+name: "Code Scanning - Action"
+on: push
+jobs:
+    CodeQL-Build:
+        runs-on: ubuntu-latest
+
+        permissions:
+        # required for all workflows
+        security-events: write
+
+        # only required for workflows in private repositories
+        actions: read
+        contents: read
+
+    steps:
+        - name: Checkout repository
+          uses: actions/checkout@v3
+
+        # Initializes the CodeQL tools for scanning.
+        - name: Initialize CodeQL
+          uses: github/codeql-action/init@v2
+          with:
+            languages: java
+
+        # Build the project, including steps to (i) install tools (including compilers in the appropriate versions, 
+        # package managers, and build tools), (ii) install dependencies, (iii) build the code.
+        - name:
+              uses: actions/setup-java@v1
+              with:
+                java-version: 8
+            - name: Install Gradle
+              run: sudo apt-get install gradle
+            - name: Set environment variables
+              run: |
+                export JAVA_TOOLCHAIN_HOME=<path_to_java_toolchain>
+                export JAVA_HOME=<path_to_java>
+                export RUNTIME_JAVA_HOME=<path_to_runtime_java>
+                export JAVA20_HOME=<path_to_java20>
+                export JAVA19_HOME=<path_to_java19>
+                export JAVA18_HOME=<path_to_java18>
+                export JAVA17_HOME=<path_to_java17>
+                export JAVA16_HOME=<path_to_java16>
+                export JAVA15_HOME=<path_to_java15>
+                export JAVA14_HOME=<path_to_java14>
+                export JAVA13_HOME=<path_to_java13>
+                export JAVA12_HOME=<path_to_java12>
+                export JAVA11_HOME=<path_to_java11>
+                export JAVA8_HOME=<path_to_java8>
+            - name: Install Maven
+              run: sudo apt-get install maven
+            - name: Build project
+              run: gradle build
+
+
+        # Analyze the project using CodeQL.
+        - name: Perform CodeQL Analysis
+          uses: github/codeql-action/analyze@v2
